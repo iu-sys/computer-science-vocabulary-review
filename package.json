@@ -7,6 +7,6 @@
     "build": "node scripts/build-bundle.mjs",
     "pretest": "npm run build",
     "test": "node --test",
-    "check": "npm run build && node --check src/core.js && node --check src/app.js && node --check src/app.bundle.js"
+    "check": "npm run build && node --check src/core.js && node --check src/app.js && node --check src/app.bundle.js && node --test tests/static-page.test.mjs"
   }
 }

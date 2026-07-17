@@ -39,3 +39,31 @@ test("page prevents an implicit favicon network request", async () => {
   const html = await readProjectFile("index.html");
   assert.match(html, /<link rel="icon" href="data:,">/);
 });
+
+test("offline artifact is one self-contained classic-script document", async () => {
+  const html = await readProjectFile("vocabulary-review-offline.html");
+
+  assert.match(html, /<style>[\s\S]*<\/style>/);
+  assert.match(html, /<script>[\s\S]*<\/script>/);
+  assert.doesNotMatch(html, /<link[^>]+rel=["']stylesheet["']/i);
+  assert.doesNotMatch(html, /<script[^>]+src=/i);
+  assert.doesNotMatch(html, /<script[^>]+type=["']module["']/i);
+});
+
+test("offline artifact has no imports, network APIs, or remote URLs", async () => {
+  const html = await readProjectFile("vocabulary-review-offline.html");
+
+  assert.doesNotMatch(html, /\bimport\s+(?:[({*]|[\w$])/);
+  assert.doesNotMatch(html, /\b(fetch|XMLHttpRequest|WebSocket)\b/);
+  assert.doesNotMatch(html, /https?:\/\//i);
+});
+
+test("offline artifact exposes every required study control", async () => {
+  const html = await readProjectFile("vocabulary-review-offline.html");
+  for (const id of [
+    "cards-view", "quiz-view", "mistakes-view", "flashcard",
+    "quiz-mode", "quiz-scope", "start-quiz", "clear-progress"
+  ]) {
+    assert.ok(html.includes(`id="${id}"`), `offline artifact missing #${id}`);
+  }
+});
