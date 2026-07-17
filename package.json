@@ -1,0 +1,12 @@
+{
+  "name": "computer-science-vocabulary-review",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-bundle.mjs",
+    "pretest": "npm run build",
+    "test": "node --test",
+    "check": "npm run build && node --check src/core.js && node --check src/app.js && node --check src/app.bundle.js"
+  }
+}

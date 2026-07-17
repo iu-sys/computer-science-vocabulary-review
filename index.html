@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Computer Science Vocabulary Review</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell">
+      <p class="eyebrow">Computer Science English</p>
+      <h1>Vocabulary Review</h1>
+      <nav class="view-tabs" aria-label="Study mode">
+        <button type="button" data-view-button="cards-view" aria-controls="cards-view" aria-pressed="true">Flashcards</button>
+        <button type="button" data-view-button="quiz-view" aria-controls="quiz-view" aria-pressed="false">Quiz</button>
+        <button type="button" data-view-button="mistakes-view" aria-controls="mistakes-view" aria-pressed="false">Mistakes</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+
+    <section id="cards-view" class="view" aria-labelledby="cards-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Study</p>
+          <h2 id="cards-heading">Flashcards</h2>
+        </div>
+        <label for="card-order">Card order
+          <select id="card-order">
+            <option value="sequential">PDF order</option>
+            <option value="random">Random order</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="card-count" class="count" aria-live="polite"></p>
+      <article id="flashcard" class="flashcard" aria-live="polite">
+        <div id="card-front" class="card-face">
+          <p class="face-label">Term</p>
+          <h3 id="card-term"></h3>
+          <p class="flip-hint">Use “Flip” to see the definition.</p>
+        </div>
+        <div id="card-back" class="card-face" hidden>
+          <p class="face-label">Definition</p>
+          <p id="card-definition" class="definition"></p>
+          <p id="card-zh" class="translation"></p>
+          <p class="source-line"><span id="card-source"></span> · <span id="card-page"></span></p>
+        </div>
+      </article>
+
+      <div class="action-row card-navigation" aria-label="Card navigation">
+        <button id="previous-card" type="button">Previous</button>
+        <button id="flip-card" type="button" class="primary">Flip</button>
+        <button id="next-card" type="button">Next</button>
+      </div>
+      <div class="action-row" aria-label="Mark current card">
+        <button id="mark-review" type="button">Mark for review</button>
+        <button id="mark-familiar" type="button">Mark familiar</button>
+      </div>
+    </section>
+
+    <section id="quiz-view" class="view" aria-labelledby="quiz-heading" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Practice</p>
+          <h2 id="quiz-heading">Quiz</h2>
+        </div>
+      </div>
+      <div class="quiz-setup">
+        <label for="quiz-mode">Question type
+          <select id="quiz-mode">
+            <option value="term-to-zh">Term → Chinese</option>
+            <option value="definition-to-term">Definition → term</option>
+            <option value="spelling">Spelling</option>
+          </select>
+        </label>
+        <label for="quiz-scope">Question scope
+          <select id="quiz-scope">
+            <option value="random">10 random questions</option>
+            <option value="mistakes">Up to 10 mistakes</option>
+          </select>
+        </label>
+        <button id="start-quiz" type="button" class="primary">Start quiz</button>
+      </div>
+
+      <div id="quiz-stage" class="quiz-stage" aria-live="polite" hidden>
+        <p id="quiz-progress" class="count"></p>
+        <h3 id="quiz-prompt"></h3>
+        <div id="quiz-options" class="quiz-options"></div>
+        <form id="spelling-form" class="spelling-form" hidden>
+          <label for="spelling-answer">Type the English term</label>
+          <input id="spelling-answer" name="answer" type="text" autocomplete="off" spellcheck="false">
+          <button id="submit-spelling" type="submit" class="primary">Check answer</button>
+        </form>
+        <div id="quiz-feedback" class="feedback" role="status"></div>
+        <p id="quiz-correct-answer" class="correct-answer"></p>
+        <button id="next-question" type="button" class="primary" hidden>Next question</button>
+      </div>
+    </section>
+
+    <section id="mistakes-view" class="view" aria-labelledby="mistakes-heading" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Review</p>
+          <h2 id="mistakes-heading">Mistakes</h2>
+        </div>
+      </div>
+      <p id="last-score"></p>
+      <ul id="mistake-list" class="mistake-list"></ul>
+      <div class="action-row">
+        <button id="retry-mistakes" type="button" class="primary">Retry mistakes</button>
+        <button id="clear-progress" type="button" class="danger">Clear saved progress</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="./src/app.bundle.js"></script>
+</body>
+</html>

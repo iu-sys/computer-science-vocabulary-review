@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+playwright-report/
+output/playwright/
+*.pdf
+tmp/
+.superpowers/
