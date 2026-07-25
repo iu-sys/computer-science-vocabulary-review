@@ -16,6 +16,7 @@
         <button type="button" data-view-button="cards-view" aria-controls="cards-view" aria-pressed="true">Flashcards</button>
         <button type="button" data-view-button="quiz-view" aria-controls="quiz-view" aria-pressed="false">Quiz</button>
         <button type="button" data-view-button="mistakes-view" aria-controls="mistakes-view" aria-pressed="false">Mistakes</button>
+        <button type="button" data-view-button="pdf-practice-view" aria-controls="pdf-practice-view" aria-pressed="false">PDF Practice</button>
       </nav>
     </div>
   </header>
@@ -100,6 +101,43 @@
         <div id="quiz-feedback" class="feedback" role="status"></div>
         <p id="quiz-correct-answer" class="correct-answer"></p>
         <button id="next-question" type="button" class="primary" hidden>Next question</button>
+      </div>
+    </section>
+
+    <section id="pdf-practice-view" class="view" aria-labelledby="pdf-practice-heading" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Worksheet</p>
+          <h2 id="pdf-practice-heading">PDF Practice</h2>
+        </div>
+      </div>
+
+      <div class="worksheet-setup">
+        <label for="worksheet-type">Practice type
+          <select id="worksheet-type">
+            <option value="definition-matching">Definition Matching</option>
+            <option value="sentence-completion">Sentence Completion</option>
+          </select>
+        </label>
+        <label for="worksheet-group">PDF exercise
+          <select id="worksheet-group"></select>
+        </label>
+      </div>
+
+      <article class="worksheet-sheet" aria-labelledby="worksheet-label">
+        <p id="worksheet-progress" class="count"></p>
+        <h3 id="worksheet-label"></h3>
+        <p class="worksheet-instructions">Select a word, then select an answer slot.</p>
+        <div id="worksheet-bank" class="worksheet-bank" role="group" aria-label="Word bank"></div>
+        <ol id="worksheet-prompts" class="worksheet-prompts"></ol>
+        <p id="worksheet-score" class="worksheet-score" role="status" aria-live="polite"></p>
+      </article>
+
+      <div class="action-row worksheet-actions">
+        <button id="previous-worksheet" type="button">Previous exercise</button>
+        <button id="check-worksheet" type="button" class="primary">Check answers</button>
+        <button id="reset-worksheet" type="button">Try again</button>
+        <button id="next-worksheet" type="button">Next exercise</button>
       </div>
     </section>
 

@@ -8,18 +8,22 @@ const readProjectFile = (path) =>
 test("page exposes the complete accessible study interface", async () => {
   const html = await readProjectFile("index.html");
   const requiredIds = [
-    "cards-view", "quiz-view", "mistakes-view",
+    "cards-view", "quiz-view", "mistakes-view", "pdf-practice-view",
     "card-order", "card-count", "flashcard", "card-front", "card-back",
     "previous-card", "flip-card", "mark-review", "mark-familiar", "next-card",
     "quiz-mode", "quiz-scope", "start-quiz", "quiz-stage", "quiz-feedback",
     "next-question", "mistake-list", "retry-mistakes", "clear-progress",
+    "worksheet-type", "worksheet-group", "worksheet-label", "worksheet-progress",
+    "worksheet-bank", "worksheet-prompts", "worksheet-score",
+    "check-worksheet", "reset-worksheet",
+    "previous-worksheet", "next-worksheet",
     "status-message"
   ];
 
   for (const id of requiredIds) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id}`);
   }
-  assert.equal((html.match(/data-view-button=/g) || []).length, 3);
+  assert.equal((html.match(/data-view-button=/g) || []).length, 4);
   assert.match(html, /<main\b/);
   assert.match(html, /aria-live=["']polite["']/);
   assert.match(html, /<link[^>]+href=["']\.\/styles\.css["']/);
@@ -37,6 +41,11 @@ test("styles provide responsive, touch-friendly, non-color-only presentation", a
   assert.match(css, /min-height\s*:\s*44px/);
   assert.match(css, /:focus-visible/);
   assert.match(css, /flex-wrap\s*:\s*wrap/);
+  assert.match(css, /\.worksheet-bank[\s\S]*flex-wrap\s*:\s*wrap/);
+  assert.match(css, /\.worksheet-slot[\s\S]*min-height\s*:\s*44px/);
+  assert.match(css, /\[data-status=["']correct["']\]/);
+  assert.match(css, /\[data-status=["']incorrect["']\]/);
+  assert.match(css, /\[data-status=["']unanswered["']\]/);
   assert.doesNotMatch(css, /height\s*:\s*100vh/);
   assert.doesNotMatch(css, /overflow-x\s*:\s*hidden/);
 });
