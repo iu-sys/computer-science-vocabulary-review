@@ -119,8 +119,8 @@ const shuffled = (values, random = Math.random) => {
   return copy;
 };
 
-const selectQuizEntries = (pool, random = Math.random) =>
-  shuffled(pool, random).slice(0, 10);
+const selectQuizEntries = (pool, random = Math.random, limit = 10) =>
+  shuffled(pool, random).slice(0, limit);
 
 function createChoiceQuestion(entry, pool, mode, random = Math.random) {
   const toChinese = mode === "term-to-zh";
@@ -444,6 +444,7 @@ function nextQuestion() {
 }
 
 function startQuiz({ mistakesOnly = elements.quizScope.value === "mistakes" } = {}) {
+  const selectedScope = elements.quizScope.value;
   const pool = mistakesOnly
     ? state.progress.mistakes.map((id) => byId.get(id)).filter(Boolean)
     : VOCABULARY;
@@ -452,7 +453,8 @@ function startQuiz({ mistakesOnly = elements.quizScope.value === "mistakes" } = 
     announce("There are no saved mistakes to retry.");
     return;
   }
-  const entries = selectQuizEntries(pool);
+  const limit = !mistakesOnly && selectedScope === "all" ? pool.length : 10;
+  const entries = selectQuizEntries(pool, Math.random, limit);
   const selectedMode = elements.quizMode.value;
   state.quiz = {
     mode: QUIZ_MODES.has(selectedMode) ? selectedMode : "term-to-zh",

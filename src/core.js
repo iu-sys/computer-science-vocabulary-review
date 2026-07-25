@@ -13,8 +13,8 @@ const shuffled = (values, random = Math.random) => {
   return copy;
 };
 
-export const selectQuizEntries = (pool, random = Math.random) =>
-  shuffled(pool, random).slice(0, 10);
+export const selectQuizEntries = (pool, random = Math.random, limit = 10) =>
+  shuffled(pool, random).slice(0, limit);
 
 export function createChoiceQuestion(entry, pool, mode, random = Math.random) {
   const toChinese = mode === "term-to-zh";

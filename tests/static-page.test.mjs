@@ -30,9 +30,15 @@ test("direct-file entry point uses one local classic script", async () => {
   assert.doesNotMatch(html, /<script[^>]+type=["']module["']/);
 });
 
-test("mistake quiz scope accurately describes the ten-question cap", async () => {
+test("quiz scope defaults to all words and retains short practice options", async () => {
   const html = await readProjectFile("index.html");
-  assert.match(html, /<option value="mistakes">Up to 10 mistakes<\/option>/);
+  const allIndex = html.indexOf('<option value="all">All 94 words</option>');
+  const randomIndex = html.indexOf('<option value="random">10 random questions</option>');
+  const mistakesIndex = html.indexOf('<option value="mistakes">Up to 10 mistakes</option>');
+
+  assert.ok(allIndex >= 0);
+  assert.ok(randomIndex > allIndex);
+  assert.ok(mistakesIndex > randomIndex);
 });
 
 test("page prevents an implicit favicon network request", async () => {

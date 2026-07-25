@@ -92,3 +92,12 @@ test("quiz selection uses every entry when the pool has fewer than 10", () => {
   assert.equal(selected.length, entries.length);
   assert.deepEqual(new Set(selected), new Set(entries));
 });
+
+test("quiz selection can use every entry when the requested limit is the pool size", () => {
+  const entries = Array.from({ length: 94 }, (_, index) => ({ id: index }));
+
+  const selected = core.selectQuizEntries(entries, () => 0.25, entries.length);
+
+  assert.equal(selected.length, 94);
+  assert.deepEqual(new Set(selected), new Set(entries));
+});

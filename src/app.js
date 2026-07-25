@@ -263,6 +263,7 @@ function nextQuestion() {
 }
 
 function startQuiz({ mistakesOnly = elements.quizScope.value === "mistakes" } = {}) {
+  const selectedScope = elements.quizScope.value;
   const pool = mistakesOnly
     ? state.progress.mistakes.map((id) => byId.get(id)).filter(Boolean)
     : VOCABULARY;
@@ -271,7 +272,8 @@ function startQuiz({ mistakesOnly = elements.quizScope.value === "mistakes" } = 
     announce("There are no saved mistakes to retry.");
     return;
   }
-  const entries = selectQuizEntries(pool);
+  const limit = !mistakesOnly && selectedScope === "all" ? pool.length : 10;
+  const entries = selectQuizEntries(pool, Math.random, limit);
   const selectedMode = elements.quizMode.value;
   state.quiz = {
     mode: QUIZ_MODES.has(selectedMode) ? selectedMode : "term-to-zh",
