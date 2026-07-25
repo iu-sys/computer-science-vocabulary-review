@@ -101,3 +101,113 @@ test("quiz selection can use every entry when the requested limit is the pool si
   assert.equal(selected.length, 94);
   assert.deepEqual(new Set(selected), new Set(entries));
 });
+
+test("worksheet assignment moves a word instead of duplicating it", () => {
+  const first = core.assignWorksheetAnswer({}, "p1", "word-a");
+  const moved = core.assignWorksheetAnswer(first, "p2", "word-a");
+  assert.deepEqual(moved, { p2: "word-a" });
+  assert.deepEqual(first, { p1: "word-a" });
+});
+
+test("worksheet assignment replaces and removes answers immutably", () => {
+  const original = { p1: "word-a", p2: "word-b" };
+  assert.deepEqual(
+    core.assignWorksheetAnswer(original, "p1", "word-c"),
+    { p1: "word-c", p2: "word-b" }
+  );
+  assert.deepEqual(
+    core.removeWorksheetAnswer(original, "p1"),
+    { p2: "word-b" }
+  );
+  assert.deepEqual(original, { p1: "word-a", p2: "word-b" });
+});
+
+test("worksheet grading distinguishes correct incorrect and unanswered", () => {
+  const group = {
+    prompts: [
+      { id: "p1", answerId: "word-a" },
+      { id: "p2", answerId: "word-b" },
+      { id: "p3", answerId: "word-c" }
+    ]
+  };
+  assert.deepEqual(
+    core.gradeWorksheetGroup(group, { p1: "word-a", p2: "word-c" }),
+    {
+      correct: 1,
+      total: 3,
+      results: [
+        { promptId: "p1", status: "correct", answerId: "word-a" },
+        { promptId: "p2", status: "incorrect", answerId: "word-b" },
+        { promptId: "p3", status: "unanswered", answerId: "word-c" }
+      ]
+    }
+  );
+});
+
+test("blank worksheets score zero and map every answer to mistake vocabulary", () => {
+  const group = {
+    wordBank: [
+      { id: "word-a", vocabularyId: "vocab-a" }
+    ],
+    prompts: [
+      { id: "p1", answerId: "word-a" },
+      { id: "p2", answerId: "word-a" }
+    ]
+  };
+  const grade = core.gradeWorksheetGroup(group, {});
+  assert.equal(grade.correct, 0);
+  assert.equal(grade.total, 2);
+  assert.ok(grade.results.every(({ status }) => status === "unanswered"));
+  assert.deepEqual(
+    core.worksheetMistakeVocabularyIds(group, grade),
+    ["vocab-a"]
+  );
+});
+
+test("worksheet saved progress discards unknown groups prompts and words", () => {
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }, { id: "word-b" }],
+    prompts: [{ id: "p1" }, { id: "p2" }]
+  }];
+  assert.deepEqual(
+    core.mergeWorksheetProgress({
+      groups: {
+        g1: {
+          assignments: {
+            p1: "word-a",
+            missingPrompt: "word-b",
+            p2: "missingWord"
+          },
+          score: { correct: 1, total: 2 }
+        },
+        missingGroup: { assignments: { p1: "word-a" }, score: null }
+      }
+    }, groups),
+    {
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: { correct: 1, total: 2 }
+        }
+      }
+    }
+  );
+});
+
+test("worksheet storage failure falls back safely", () => {
+  const broken = {
+    getItem() { throw Error("blocked"); },
+    setItem() { throw Error("blocked"); },
+    removeItem() { throw Error("blocked"); }
+  };
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }],
+    prompts: [{ id: "p1" }]
+  }];
+  const storage = core.worksheetProgressStorage(broken, "worksheets", groups);
+  assert.deepEqual(storage.load(), core.defaultWorksheetProgress());
+  assert.equal(storage.save(core.defaultWorksheetProgress()), false);
+  assert.equal(storage.clear(), false);
+});
