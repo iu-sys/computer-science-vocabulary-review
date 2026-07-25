@@ -195,6 +195,33 @@ test("worksheet saved progress discards unknown groups prompts and words", () =>
   );
 });
 
+test("worksheet saved progress discards scores greater than the prompt total", () => {
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }],
+    prompts: [{ id: "p1" }, { id: "p2" }]
+  }];
+
+  assert.deepEqual(
+    core.mergeWorksheetProgress({
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: { correct: 3, total: 2 }
+        }
+      }
+    }, groups),
+    {
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: null
+        }
+      }
+    }
+  );
+});
+
 test("worksheet storage failure falls back safely", () => {
   const broken = {
     getItem() { throw Error("blocked"); },

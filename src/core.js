@@ -142,6 +142,7 @@ export function mergeWorksheetProgress(value, groups) {
     const score = saved.score
       && Number.isInteger(saved.score.correct)
       && saved.score.correct >= 0
+      && saved.score.correct <= group.prompts.length
       && saved.score.total === group.prompts.length
       ? { correct: saved.score.correct, total: saved.score.total }
       : null;
