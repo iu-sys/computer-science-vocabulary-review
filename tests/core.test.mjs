@@ -144,6 +144,85 @@ test("worksheet grading distinguishes correct incorrect and unanswered", () => {
   );
 });
 
+test("worksheet group validation accepts the supported schema", () => {
+  assert.equal(core.isValidWorksheetGroup({
+    id: "g1",
+    label: "PDF Page 1 · Definition Matching",
+    page: 1,
+    type: "definition-matching",
+    wordBank: [{
+      id: "word-a",
+      term: "algorithm",
+      vocabularyId: "vocab-a"
+    }],
+    prompts: [{
+      id: "p1",
+      text: "A procedure.",
+      answerId: "word-a"
+    }]
+  }), true);
+});
+
+test("worksheet group validation rejects duplicate IDs and unknown answers", () => {
+  const base = {
+    id: "g1",
+    label: "PDF Page 1 · Definition Matching",
+    page: 1,
+    type: "definition-matching",
+    wordBank: [
+      { id: "word-a", term: "algorithm", vocabularyId: "vocab-a" },
+      { id: "word-b", term: "automation", vocabularyId: "vocab-b" }
+    ],
+    prompts: [
+      { id: "p1", text: "A procedure.", answerId: "word-a" },
+      { id: "p2", text: "Automatic operation.", answerId: "word-b" }
+    ]
+  };
+
+  assert.equal(core.isValidWorksheetGroup({
+    ...base,
+    wordBank: [base.wordBank[0], { ...base.wordBank[1], id: "word-a" }]
+  }), false);
+  assert.equal(core.isValidWorksheetGroup({
+    ...base,
+    prompts: [base.prompts[0], { ...base.prompts[1], id: "p1" }]
+  }), false);
+  assert.equal(core.isValidWorksheetGroup({
+    ...base,
+    prompts: [base.prompts[0], { ...base.prompts[1], answerId: "missing-word" }]
+  }), false);
+  assert.equal(core.isValidWorksheetGroup({
+    ...base,
+    wordBank: [],
+    prompts: []
+  }), false);
+});
+
+test("worksheet group validation requires one blank in sentence prompts", () => {
+  const group = {
+    id: "g1",
+    label: "PDF Page 1 · Sentence Completion",
+    page: 1,
+    type: "sentence-completion",
+    wordBank: [{
+      id: "word-a",
+      term: "algorithm",
+      vocabularyId: "vocab-a"
+    }],
+    prompts: [{
+      id: "p1",
+      text: "Choose an algorithm.",
+      answerId: "word-a"
+    }]
+  };
+
+  assert.equal(core.isValidWorksheetGroup(group), false);
+  assert.equal(core.isValidWorksheetGroup({
+    ...group,
+    prompts: [{ ...group.prompts[0], text: "Choose {{blank}} now." }]
+  }), true);
+});
+
 test("blank worksheets score zero and map every answer to mistake vocabulary", () => {
   const group = {
     wordBank: [
@@ -168,7 +247,10 @@ test("worksheet saved progress discards unknown groups prompts and words", () =>
   const groups = [{
     id: "g1",
     wordBank: [{ id: "word-a" }, { id: "word-b" }],
-    prompts: [{ id: "p1" }, { id: "p2" }]
+    prompts: [
+      { id: "p1", answerId: "word-a" },
+      { id: "p2", answerId: "word-b" }
+    ]
   }];
   assert.deepEqual(
     core.mergeWorksheetProgress({
@@ -189,6 +271,93 @@ test("worksheet saved progress discards unknown groups prompts and words", () =>
         g1: {
           assignments: { p1: "word-a" },
           score: { correct: 1, total: 2 }
+        }
+      }
+    }
+  );
+});
+
+test("worksheet saved progress recalculates a structurally valid inconsistent score", () => {
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }, { id: "word-b" }],
+    prompts: [
+      { id: "p1", answerId: "word-a" },
+      { id: "p2", answerId: "word-b" }
+    ]
+  }];
+
+  assert.deepEqual(
+    core.mergeWorksheetProgress({
+      groups: {
+        g1: {
+          assignments: { p1: "word-b", p2: "word-a" },
+          score: { correct: 2, total: 2 }
+        }
+      }
+    }, groups),
+    {
+      groups: {
+        g1: {
+          assignments: { p1: "word-b", p2: "word-a" },
+          score: { correct: 0, total: 2 }
+        }
+      }
+    }
+  );
+});
+
+test("worksheet saved progress recalculates score after invalid assignments are removed", () => {
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }, { id: "word-b" }],
+    prompts: [
+      { id: "p1", answerId: "word-a" },
+      { id: "p2", answerId: "word-b" }
+    ]
+  }];
+
+  assert.deepEqual(
+    core.mergeWorksheetProgress({
+      groups: {
+        g1: {
+          assignments: { p1: "word-a", p2: "missing-word" },
+          score: { correct: 2, total: 2 }
+        }
+      }
+    }, groups),
+    {
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: { correct: 1, total: 2 }
+        }
+      }
+    }
+  );
+});
+
+test("worksheet saved progress preserves an unchecked null score", () => {
+  const groups = [{
+    id: "g1",
+    wordBank: [{ id: "word-a" }],
+    prompts: [{ id: "p1", answerId: "word-a" }]
+  }];
+
+  assert.deepEqual(
+    core.mergeWorksheetProgress({
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: null
+        }
+      }
+    }, groups),
+    {
+      groups: {
+        g1: {
+          assignments: { p1: "word-a" },
+          score: null
         }
       }
     }

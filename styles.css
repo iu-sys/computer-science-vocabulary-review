@@ -356,7 +356,7 @@ main {
 }
 
 .worksheet-prompt[data-status="correct"] .worksheet-result::before {
-  content: "✓ Correct: ";
+  content: "✓ ";
 }
 
 .worksheet-prompt[data-status="incorrect"] .worksheet-result,
@@ -365,11 +365,11 @@ main {
 }
 
 .worksheet-prompt[data-status="incorrect"] .worksheet-result::before {
-  content: "✕ Incorrect: ";
+  content: "✕ ";
 }
 
 .worksheet-prompt[data-status="unanswered"] .worksheet-result::before {
-  content: "✕ Unanswered: ";
+  content: "✕ ";
 }
 
 .mistake-list {

@@ -115,6 +115,46 @@ export function gradeWorksheetGroup(group, assignments) {
   };
 }
 
+const isNonEmptyString = (value) =>
+  typeof value === "string" && value.trim().length > 0;
+
+const hasUniqueStringIds = (items) => {
+  const ids = items.map(({ id }) => id);
+  return ids.every(isNonEmptyString) && new Set(ids).size === ids.length;
+};
+
+export function isValidWorksheetGroup(group) {
+  if (
+    !group
+    || typeof group !== "object"
+    || !isNonEmptyString(group.id)
+    || !isNonEmptyString(group.label)
+    || !Number.isInteger(group.page)
+    || group.page < 1
+    || !["definition-matching", "sentence-completion"].includes(group.type)
+    || !Array.isArray(group.wordBank)
+    || !Array.isArray(group.prompts)
+    || group.wordBank.length === 0
+    || group.prompts.length === 0
+    || !hasUniqueStringIds(group.wordBank)
+    || !hasUniqueStringIds(group.prompts)
+  ) {
+    return false;
+  }
+
+  const wordIds = new Set(group.wordBank.map(({ id }) => id));
+  const wordsAreValid = group.wordBank.every(
+    ({ term, vocabularyId }) =>
+      isNonEmptyString(term) && isNonEmptyString(vocabularyId)
+  );
+  const promptsAreValid = group.prompts.every(({ text, answerId }) => {
+    if (!isNonEmptyString(text) || !wordIds.has(answerId)) return false;
+    if (group.type !== "sentence-completion") return true;
+    return text.split("{{blank}}").length === 2;
+  });
+  return wordsAreValid && promptsAreValid;
+}
+
 export const defaultWorksheetProgress = () => ({ groups: {} });
 
 export function mergeWorksheetProgress(value, groups) {
@@ -139,12 +179,16 @@ export function mergeWorksheetProgress(value, groups) {
         usedWords.add(wordId);
       }
     }
-    const score = saved.score
+    const hasValidSavedScore = saved.score
       && Number.isInteger(saved.score.correct)
       && saved.score.correct >= 0
       && saved.score.correct <= group.prompts.length
-      && saved.score.total === group.prompts.length
-      ? { correct: saved.score.correct, total: saved.score.total }
+      && saved.score.total === group.prompts.length;
+    const grade = hasValidSavedScore
+      ? gradeWorksheetGroup(group, assignments)
+      : null;
+    const score = grade
+      ? { correct: grade.correct, total: grade.total }
       : null;
     cleanGroups[group.id] = { assignments, score };
   }
