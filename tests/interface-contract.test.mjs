@@ -68,4 +68,14 @@ test("app source includes required state, quiz, persistence, and safe-rendering 
   assert.match(app, /submitSpelling:\s*document\.querySelector\(["']#submit-spelling["']\)/);
   assert.match(app, /submitSpelling\.disabled\s*=\s*true/);
   assert.match(app, /submitSpelling\.disabled\s*=\s*false/);
+  assert.match(app, /from\s+["']\.\/worksheet\.js["']/);
+  assert.match(app, /cs-pdf-practice-v1/);
+  assert.match(app, /assignWorksheetAnswer/);
+  assert.match(app, /removeWorksheetAnswer/);
+  assert.match(app, /gradeWorksheetGroup/);
+  assert.match(app, /mergeWorksheetProgress/);
+  assert.match(app, /worksheetProgressStorage/);
+  assert.match(app, /worksheetMistakeVocabularyIds/);
+  assert.match(app, /worksheetScore\.textContent\s*=/);
+  assert.doesNotMatch(app, /\.innerHTML\s*=/);
 });

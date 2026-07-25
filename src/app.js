@@ -1,16 +1,26 @@
 import { VOCABULARY } from "./vocabulary.js";
+import { WORKSHEET_GROUPS } from "./worksheet.js";
 import {
+  assignWorksheetAnswer,
   createChoiceQuestion,
   defaultProgress,
+  defaultWorksheetProgress,
   gradeSpelling,
+  gradeWorksheetGroup,
+  mergeWorksheetProgress,
   progressStorage,
+  removeWorksheetAnswer,
+  worksheetMistakeVocabularyIds,
+  worksheetProgressStorage,
   selectQuizEntries
 } from "./core.js";
 
 const STORAGE_KEY = "cs-vocabulary-progress-v1";
+const WORKSHEET_STORAGE_KEY = "cs-pdf-practice-v1";
 const QUIZ_MODES = new Set(["term-to-zh", "definition-to-term", "spelling"]);
 const byId = new Map(VOCABULARY.map((entry) => [entry.id, entry]));
 const validIds = new Set(byId.keys());
+const worksheetById = new Map(WORKSHEET_GROUPS.map((group) => [group.id, group]));
 
 const elements = {
   viewButtons: [...document.querySelectorAll("[data-view-button]")],
@@ -46,7 +56,18 @@ const elements = {
   lastScore: document.querySelector("#last-score"),
   mistakeList: document.querySelector("#mistake-list"),
   retryMistakes: document.querySelector("#retry-mistakes"),
-  clearProgress: document.querySelector("#clear-progress")
+  clearProgress: document.querySelector("#clear-progress"),
+  worksheetType: document.querySelector("#worksheet-type"),
+  worksheetGroup: document.querySelector("#worksheet-group"),
+  worksheetLabel: document.querySelector("#worksheet-label"),
+  worksheetProgress: document.querySelector("#worksheet-progress"),
+  worksheetBank: document.querySelector("#worksheet-bank"),
+  worksheetPrompts: document.querySelector("#worksheet-prompts"),
+  worksheetScore: document.querySelector("#worksheet-score"),
+  checkWorksheet: document.querySelector("#check-worksheet"),
+  resetWorksheet: document.querySelector("#reset-worksheet"),
+  previousWorksheet: document.querySelector("#previous-worksheet"),
+  nextWorksheet: document.querySelector("#next-worksheet")
 };
 
 const unavailableStorage = {
@@ -57,15 +78,26 @@ const unavailableStorage = {
 
 let storageAvailable = true;
 let store;
+let worksheetStore;
 try {
   const storage = window.localStorage;
   const probeKey = `${STORAGE_KEY}-probe`;
   storage.setItem(probeKey, "1");
   storage.removeItem(probeKey);
   store = progressStorage(storage, STORAGE_KEY);
+  worksheetStore = worksheetProgressStorage(
+    storage,
+    WORKSHEET_STORAGE_KEY,
+    WORKSHEET_GROUPS
+  );
 } catch {
   storageAvailable = false;
   store = progressStorage(unavailableStorage, STORAGE_KEY);
+  worksheetStore = worksheetProgressStorage(
+    unavailableStorage,
+    WORKSHEET_STORAGE_KEY,
+    WORKSHEET_GROUPS
+  );
 }
 
 const state = {
@@ -73,7 +105,14 @@ const state = {
   cardIndex: 0,
   flipped: false,
   progress: store.load(validIds),
-  quiz: null
+  quiz: null,
+  worksheet: {
+    type: "definition-matching",
+    groupId: "p1-definition-matching",
+    selectedWordId: null,
+    progress: worksheetStore.load(),
+    grade: null
+  }
 };
 
 function shuffle(values) {
@@ -107,6 +146,222 @@ function setView(viewId) {
     button.setAttribute("aria-pressed", String(button.dataset.viewButton === viewId));
   }
   if (viewId === "mistakes-view") renderMistakes();
+  if (viewId === "pdf-practice-view") {
+    renderWorksheetSelectors();
+    renderWorksheet();
+  }
+}
+
+function worksheetGroupsForType(type) {
+  return WORKSHEET_GROUPS.filter((group) => group.type === type);
+}
+
+function currentWorksheetGroup() {
+  return worksheetById.get(state.worksheet.groupId) || null;
+}
+
+function currentWorksheetProgress() {
+  const group = currentWorksheetGroup();
+  if (!group) return { assignments: {}, score: null };
+  return state.worksheet.progress.groups[group.id] || {
+    assignments: {},
+    score: null
+  };
+}
+
+function saveWorksheetProgress(message = "") {
+  if (!worksheetStore.save(state.worksheet.progress)) storageAvailable = false;
+  announce(message);
+}
+
+function renderWorksheetSelectors() {
+  const groups = worksheetGroupsForType(state.worksheet.type);
+  if (groups.length === 0) {
+    elements.worksheetGroup.replaceChildren();
+    return;
+  }
+  if (!groups.some((group) => group.id === state.worksheet.groupId)) {
+    state.worksheet.groupId = groups[0].id;
+    state.worksheet.selectedWordId = null;
+    state.worksheet.grade = null;
+  }
+  elements.worksheetType.value = state.worksheet.type;
+  elements.worksheetGroup.replaceChildren();
+  for (const group of groups) {
+    const option = document.createElement("option");
+    option.value = group.id;
+    option.textContent = group.label;
+    elements.worksheetGroup.append(option);
+  }
+  elements.worksheetGroup.value = state.worksheet.groupId;
+}
+
+function worksheetSlot(prompt, wordById, assignments) {
+  const button = document.createElement("button");
+  const selectedWord = wordById.get(assignments[prompt.id]);
+  button.type = "button";
+  button.className = "worksheet-slot";
+  button.dataset.promptId = prompt.id;
+  button.textContent = selectedWord ? selectedWord.term : "Select a word";
+  button.setAttribute(
+    "aria-label",
+    selectedWord
+      ? `Answer for prompt: ${selectedWord.term}. Select to remove it.`
+      : "Empty answer slot. Select a word, then select this slot."
+  );
+  button.addEventListener("click", () => activateWorksheetSlot(prompt.id));
+  return button;
+}
+
+function renderWorksheet() {
+  const group = currentWorksheetGroup();
+  elements.worksheetBank.replaceChildren();
+  elements.worksheetPrompts.replaceChildren();
+  elements.worksheetScore.textContent = "";
+
+  if (!group) {
+    elements.worksheetLabel.textContent = "Worksheet unavailable.";
+    elements.worksheetProgress.textContent = "";
+    elements.checkWorksheet.disabled = true;
+    elements.resetWorksheet.disabled = true;
+    elements.previousWorksheet.disabled = true;
+    elements.nextWorksheet.disabled = true;
+    return;
+  }
+
+  const groups = worksheetGroupsForType(state.worksheet.type);
+  const groupIndex = groups.findIndex(({ id }) => id === group.id);
+  const saved = currentWorksheetProgress();
+  const assignments = saved.assignments;
+  const wordById = new Map(group.wordBank.map((word) => [word.id, word]));
+  const grade = saved.score
+    ? gradeWorksheetGroup(group, assignments)
+    : state.worksheet.grade;
+
+  elements.worksheetLabel.textContent = group.label;
+  elements.worksheetProgress.textContent = `Exercise ${groupIndex + 1} / ${groups.length}`;
+  elements.checkWorksheet.disabled = false;
+  elements.resetWorksheet.disabled = false;
+  elements.previousWorksheet.disabled = groupIndex <= 0;
+  elements.nextWorksheet.disabled = groupIndex === groups.length - 1;
+
+  for (const word of group.wordBank) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.wordId = word.id;
+    button.dataset.used = String(Object.values(assignments).includes(word.id));
+    button.setAttribute("aria-pressed", String(state.worksheet.selectedWordId === word.id));
+    button.textContent = word.term;
+    button.addEventListener("click", () => selectWorksheetWord(word.id));
+    elements.worksheetBank.append(button);
+  }
+
+  const gradeByPromptId = new Map((grade?.results || []).map((result) => [result.promptId, result]));
+  for (const prompt of group.prompts) {
+    const item = document.createElement("li");
+    item.className = "worksheet-prompt";
+    const promptGrade = gradeByPromptId.get(prompt.id);
+    if (promptGrade) item.dataset.status = promptGrade.status;
+
+    if (group.type === "sentence-completion") {
+      const [before, after] = prompt.text.split("{{blank}}");
+      item.append(document.createTextNode(before));
+      item.append(worksheetSlot(prompt, wordById, assignments));
+      item.append(document.createTextNode(after));
+    } else {
+      const text = document.createElement("span");
+      text.textContent = `${prompt.text} `;
+      item.append(text, worksheetSlot(prompt, wordById, assignments));
+    }
+
+    if (promptGrade) {
+      const result = document.createElement("p");
+      result.className = "worksheet-result";
+      result.textContent = promptGrade.status === "correct"
+        ? "Correct"
+        : promptGrade.status === "incorrect"
+          ? "Incorrect"
+          : "Not answered";
+      item.append(result);
+      if (promptGrade.status !== "correct") {
+        const answer = document.createElement("p");
+        answer.className = "correct-answer";
+        answer.textContent = `Correct word: ${wordById.get(promptGrade.answerId).term}`;
+        item.append(answer);
+      }
+    }
+    elements.worksheetPrompts.append(item);
+  }
+
+  if (saved.score) {
+    elements.worksheetScore.textContent = `Score: ${saved.score.correct} / ${saved.score.total}`;
+  }
+}
+
+function selectWorksheetWord(wordId) {
+  state.worksheet.selectedWordId =
+    state.worksheet.selectedWordId === wordId ? null : wordId;
+  renderWorksheet();
+}
+
+function activateWorksheetSlot(promptId) {
+  const group = currentWorksheetGroup();
+  if (!group) return;
+  const saved = currentWorksheetProgress();
+  const assignments = state.worksheet.selectedWordId
+    ? assignWorksheetAnswer(
+        saved.assignments,
+        promptId,
+        state.worksheet.selectedWordId
+      )
+    : removeWorksheetAnswer(saved.assignments, promptId);
+  state.worksheet.progress.groups[group.id] = { assignments, score: null };
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  saveWorksheetProgress();
+  renderWorksheet();
+}
+
+function checkWorksheet() {
+  const group = currentWorksheetGroup();
+  if (!group) return;
+  const saved = currentWorksheetProgress();
+  const grade = gradeWorksheetGroup(group, saved.assignments);
+  state.worksheet.progress.groups[group.id] = {
+    assignments: saved.assignments,
+    score: { correct: grade.correct, total: grade.total }
+  };
+  state.worksheet.grade = grade;
+  const mistakes = new Set(state.progress.mistakes);
+  for (const vocabularyId of worksheetMistakeVocabularyIds(group, grade)) {
+    mistakes.add(vocabularyId);
+  }
+  state.progress.mistakes = [...mistakes];
+  saveProgress();
+  saveWorksheetProgress(`Worksheet checked: ${grade.correct} / ${grade.total}.`);
+  renderWorksheet();
+}
+
+function resetWorksheet() {
+  const group = currentWorksheetGroup();
+  if (!group) return;
+  state.worksheet.progress.groups[group.id] = { assignments: {}, score: null };
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  saveWorksheetProgress("Worksheet reset.");
+  renderWorksheet();
+}
+
+function moveWorksheet(offset) {
+  const groups = worksheetGroupsForType(state.worksheet.type);
+  const index = groups.findIndex(({ id }) => id === state.worksheet.groupId);
+  const next = groups[index + offset];
+  if (!next) return;
+  state.worksheet.groupId = next.id;
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  renderWorksheetSelectors();
+  renderWorksheet();
 }
 
 function renderCard() {
@@ -320,15 +575,41 @@ elements.retryMistakes.addEventListener("click", () => {
   setView("quiz-view");
   startQuiz({ mistakesOnly: true });
 });
+elements.worksheetType.addEventListener("change", () => {
+  state.worksheet.type = elements.worksheetType.value;
+  const groups = worksheetGroupsForType(state.worksheet.type);
+  state.worksheet.groupId = groups[0]?.id || "";
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  renderWorksheetSelectors();
+  renderWorksheet();
+});
+elements.worksheetGroup.addEventListener("change", () => {
+  state.worksheet.groupId = elements.worksheetGroup.value;
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  renderWorksheet();
+});
+elements.checkWorksheet.addEventListener("click", checkWorksheet);
+elements.resetWorksheet.addEventListener("click", resetWorksheet);
+elements.previousWorksheet.addEventListener("click", () => moveWorksheet(-1));
+elements.nextWorksheet.addEventListener("click", () => moveWorksheet(1));
 elements.clearProgress.addEventListener("click", () => {
   if (!window.confirm("確定要清除所有熟悉度、錯題和測驗紀錄嗎？")) return;
   state.progress = defaultProgress();
+  state.worksheet.progress = defaultWorksheetProgress();
+  state.worksheet.grade = null;
+  state.worksheet.selectedWordId = null;
   if (!store.clear()) storageAvailable = false;
+  if (!worksheetStore.clear()) storageAvailable = false;
   renderCard();
   renderMistakes();
+  renderWorksheet();
   announce("Saved progress cleared.");
 });
 
 renderCard();
 renderMistakes();
+renderWorksheetSelectors();
+renderWorksheet();
 announce();
