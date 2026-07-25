@@ -9,7 +9,10 @@ test("page exposes required controls and no remote resources", async () => {
   const html = await readProjectFile("index.html");
   for (const id of [
     "cards-view", "quiz-view", "mistakes-view", "flashcard",
-    "quiz-mode", "quiz-scope", "start-quiz", "clear-progress"
+    "quiz-mode", "quiz-scope", "start-quiz", "clear-progress",
+    "pdf-practice-view", "worksheet-type", "worksheet-group",
+    "worksheet-bank", "worksheet-prompts", "worksheet-score",
+    "check-worksheet", "reset-worksheet"
   ]) {
     assert.ok(html.includes(`id="${id}"`), `missing #${id}`);
   }
@@ -68,8 +71,22 @@ test("offline artifact exposes every required study control", async () => {
   const html = await readProjectFile("vocabulary-review-offline.html");
   for (const id of [
     "cards-view", "quiz-view", "mistakes-view", "flashcard",
-    "quiz-mode", "quiz-scope", "start-quiz", "clear-progress"
+    "quiz-mode", "quiz-scope", "start-quiz", "clear-progress",
+    "pdf-practice-view", "worksheet-type", "worksheet-group",
+    "worksheet-bank", "worksheet-prompts", "worksheet-score",
+    "check-worksheet", "reset-worksheet"
   ]) {
     assert.ok(html.includes(`id="${id}"`), `offline artifact missing #${id}`);
+  }
+});
+
+test("generated runtime includes the complete worksheet dataset", async () => {
+  const bundle = await readProjectFile("src/app.bundle.js");
+  const offline = await readProjectFile("vocabulary-review-offline.html");
+  for (const source of [bundle, offline]) {
+    assert.match(source, /p1-definition-matching/);
+    assert.match(source, /p2-article-definition-matching/);
+    assert.match(source, /p1-sentence-completion/);
+    assert.match(source, /cs-pdf-practice-v1/);
   }
 });
