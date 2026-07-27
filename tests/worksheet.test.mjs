@@ -33,6 +33,7 @@ test("page 6 VR group preserves the supplied word and answer order", () => {
   const group = WORKSHEET_GROUPS.find(
     ({ id }) => id === "p6-vr-definition-matching"
   );
+  assert.equal(group.label, "Page 6 · VR Mini-glossary");
   assert.deepEqual(group.wordBank.map(({ term }) => term), [
     "VR face",
     "Simulator sickness",
