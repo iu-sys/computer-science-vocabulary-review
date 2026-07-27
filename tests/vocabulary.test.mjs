@@ -8,11 +8,12 @@ const EXPECTED_PAGE_SOURCE_TOTALS = {
   "2/article-highlight": 10,
   "3/exercise": 24,
   "4/exercise": 18,
-  "5/exercise": 10
+  "5/exercise": 10,
+  "6/vr-glossary": 12
 };
 
 function assertExactCoverage(items) {
-  assert.equal(items.length, 94);
+  assert.equal(items.length, 106);
   const totals = {};
   for (const item of items) {
     const key = `${item.page}/${item.source}`;
@@ -29,6 +30,9 @@ function assertIdSourceCorrespondence(items) {
     if (item.id.includes("-exercise-")) {
       assert.equal(item.source, "exercise", `${item.id} must use source exercise`);
     }
+    if (item.id.includes("-vr-")) {
+      assert.equal(item.source, "vr-glossary", `${item.id} must use source vr-glossary`);
+    }
   }
 }
 
@@ -40,13 +44,13 @@ test("each ID source segment corresponds to its source field", () => {
   assertIdSourceCorrespondence(VOCABULARY);
 });
 
-test("all records are complete, unique, and cover pages 1-5", () => {
+test("all records are complete, unique, and cover pages 1-6", () => {
   assert.equal(new Set(VOCABULARY.map((item) => item.id)).size, VOCABULARY.length);
-  assert.deepEqual([...new Set(VOCABULARY.map((item) => item.page))].sort(), [1, 2, 3, 4, 5]);
+  assert.deepEqual([...new Set(VOCABULARY.map((item) => item.page))].sort(), [1, 2, 3, 4, 5, 6]);
   for (const item of VOCABULARY) {
-    assert.match(item.id, /^p[1-5]-(exercise|article)-[a-z0-9-]+$/);
+    assert.match(item.id, /^p[1-5]-(exercise|article)-[a-z0-9-]+$|^p6-vr-[a-z0-9-]+$/);
     assert.ok(item.term.trim() && item.definition.trim() && item.zh.trim());
-    assert.ok(["exercise", "article-highlight"].includes(item.source));
+    assert.ok(["exercise", "article-highlight", "vr-glossary"].includes(item.source));
   }
 });
 
@@ -88,4 +92,26 @@ test("page 2 preserves the printed virtual assistant record", () => {
     page: 2,
     source: "exercise"
   });
+});
+
+test("page 6 preserves the supplied VR word-bank order and translations", () => {
+  const page6 = VOCABULARY.filter(({ page }) => page === 6);
+  assert.deepEqual(
+    page6.map(({ term, zh }) => [term, zh]),
+    [
+      ["VR face", "VR ??嚗?剜鋆蔭??憭梁?銵冽?"],
+      ["Simulator sickness", "璅⊥?冽???"],
+      ["Refresh rate", "?湔???恍?瑟??"],
+      ["Stitching", "敶勗??潭"],
+      ["Field of view (FOV)", "閬?蝭?嚗???"],
+      ["Head tracking", "?剝餈質馱"],
+      ["Latency", "撱園嚗??辣??"],
+      ["Head mounted display or HMD", "?剜撘＊蝷箏"],
+      ["Cinematic VR", "?餃蔣撘??砍祕憓?撖行 VR"],
+      ["Eye tracking", "?潛?餈質馱"],
+      ["Judder", "?恍??嚗蔣?‵??"],
+      ["Social VR", "蝷曆漱?撖血?"]
+    ]
+  );
+  assert.ok(page6.every(({ definition }) => definition.trim().length > 0));
 });
