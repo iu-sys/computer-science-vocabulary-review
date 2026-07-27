@@ -401,7 +401,7 @@ const WORKSHEET_GROUPS = [
   },
   {
     id: "p1-sentence-completion",
-    label: "PDF Page 1 · Sentence Completion",
+    label: "PDF Page 1 \u00b7 Exercise 4 \u00b7 Sentence Completion",
     page: 1,
     type: "sentence-completion",
     wordBank: [
@@ -533,6 +533,16 @@ function removeWorksheetAnswer(assignments, promptId) {
   return Object.fromEntries(
     Object.entries(assignments).filter(([existingPrompt]) => existingPrompt !== promptId)
   );
+}
+
+function selectWorksheetGroup(worksheetState, group) {
+  return {
+    ...worksheetState,
+    type: group.type,
+    groupId: group.id,
+    selectedWordId: null,
+    grade: null
+  };
 }
 
 function gradeWorksheetGroup(group, assignments) {
@@ -730,6 +740,7 @@ const elements = {
   worksheetBank: document.querySelector("#worksheet-bank"),
   worksheetPrompts: document.querySelector("#worksheet-prompts"),
   worksheetScore: document.querySelector("#worksheet-score"),
+  openSentenceCompletion: document.querySelector("#open-sentence-completion"),
   checkWorksheet: document.querySelector("#check-worksheet"),
   resetWorksheet: document.querySelector("#reset-worksheet"),
   previousWorksheet: document.querySelector("#previous-worksheet"),
@@ -863,6 +874,18 @@ function renderWorksheetSelectors() {
     elements.worksheetGroup.append(option);
   }
   elements.worksheetGroup.value = state.worksheet.groupId;
+}
+
+function openSentenceCompletion() {
+  const group = worksheetById.get("p1-sentence-completion");
+  if (!group) {
+    announce("Page 1 Exercise 4 sentence completion is unavailable.");
+    return;
+  }
+  state.worksheet = selectWorksheetGroup(state.worksheet, group);
+  renderWorksheetSelectors();
+  renderWorksheet();
+  announce("Opened Page 1 Exercise 4 sentence completion.");
 }
 
 function worksheetSlot(prompt, promptNumber, wordById, assignments) {
@@ -1319,6 +1342,7 @@ elements.worksheetGroup.addEventListener("change", () => {
   state.worksheet.grade = null;
   renderWorksheet();
 });
+elements.openSentenceCompletion.addEventListener("click", openSentenceCompletion);
 elements.checkWorksheet.addEventListener("click", checkWorksheet);
 elements.resetWorksheet.addEventListener("click", resetWorksheet);
 elements.previousWorksheet.addEventListener("click", () => moveWorksheet(-1));

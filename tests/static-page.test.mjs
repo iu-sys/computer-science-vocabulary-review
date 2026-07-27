@@ -74,7 +74,7 @@ test("offline artifact exposes every required study control", async () => {
     "quiz-mode", "quiz-scope", "start-quiz", "clear-progress",
     "pdf-practice-view", "worksheet-type", "worksheet-group",
     "worksheet-bank", "worksheet-prompts", "worksheet-score",
-    "check-worksheet", "reset-worksheet"
+    "check-worksheet", "reset-worksheet", "open-sentence-completion"
   ]) {
     assert.ok(html.includes(`id="${id}"`), `offline artifact missing #${id}`);
   }
@@ -87,10 +87,16 @@ test("generated runtime includes the complete worksheet dataset", async () => {
     assert.match(source, /p1-definition-matching/);
     assert.match(source, /p2-article-definition-matching/);
     assert.match(source, /p1-sentence-completion/);
+    assert.match(source, /open-sentence-completion/);
+    assert.match(source, /PDF Page 1 \\u00b7 Exercise 4 \\u00b7 Sentence Completion/);
     assert.match(source, /cs-pdf-practice-v1/);
     assert.match(source, /p6-vr-definition-matching/);
     assert.match(source, /p6-vr-head-mounted-display/);
     assert.match(source, /Page 6 · VR Mini-glossary/);
     assert.doesNotMatch(source, /Page 6 繚 VR Mini-glossary/);
   }
+  assert.match(
+    offline,
+    /<button[^>]+id="open-sentence-completion"[^>]*>第 1 頁第 4 題 · 句子填空（12 題）<\/button>/
+  );
 });
