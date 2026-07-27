@@ -99,18 +99,18 @@ test("page 6 preserves the supplied VR word-bank order and translations", () => 
   assert.deepEqual(
     page6.map(({ term, zh }) => [term, zh]),
     [
-      ["VR face", "VR ??嚗?剜鋆蔭??憭梁?銵冽?"],
-      ["Simulator sickness", "璅⊥?冽???"],
-      ["Refresh rate", "?湔???恍?瑟??"],
-      ["Stitching", "敶勗??潭"],
-      ["Field of view (FOV)", "閬?蝭?嚗???"],
-      ["Head tracking", "?剝餈質馱"],
-      ["Latency", "撱園嚗??辣??"],
-      ["Head mounted display or HMD", "?剜撘＊蝷箏"],
-      ["Cinematic VR", "?餃蔣撘??砍祕憓?撖行 VR"],
-      ["Eye tracking", "?潛?餈質馱"],
-      ["Judder", "?恍??嚗蔣?‵??"],
-      ["Social VR", "蝷曆漱?撖血?"]
+      ["VR face", "VR 呆臉；戴頭戴裝置時的失神表情"],
+      ["Simulator sickness", "模擬器暈動症"],
+      ["Refresh rate", "更新率；畫面刷新率"],
+      ["Stitching", "影像拼接"],
+      ["Field of view (FOV)", "視野範圍；視場"],
+      ["Head tracking", "頭部追蹤"],
+      ["Latency", "延遲；反應延遲"],
+      ["Head mounted display or HMD", "頭戴式顯示器"],
+      ["Cinematic VR", "電影式虛擬實境；實景 VR"],
+      ["Eye tracking", "眼球追蹤"],
+      ["Judder", "畫面抖動；影像顫動"],
+      ["Social VR", "社交虛擬實境"]
     ]
   );
   assert.ok(page6.every(({ definition }) => definition.trim().length > 0));
