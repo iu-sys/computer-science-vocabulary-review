@@ -115,3 +115,24 @@ test("page 6 preserves the supplied VR word-bank order and translations", () => 
   );
   assert.ok(page6.every(({ definition }) => definition.trim().length > 0));
 });
+
+test("page 6 preserves the supplied exact English definitions", () => {
+  const page6 = VOCABULARY.filter(({ page }) => page === 6);
+  assert.deepEqual(
+    page6.map(({ id, definition }) => [id, definition]),
+    [
+      ["p6-vr-vr-face", "The slightly embarrassing, slack-jawed look people get on their face when they wear an HMD!"],
+      ["p6-vr-simulator-sickness", "During a VR experience, this is a conflict between what your brain and body think they're doing, when you feel sick. Your eyes say, \"We're moving!\" And your brain says \"Nope! Let's get nauseated!\". This is one of the big challenges for developers -- figuring out how to move people without making them feel nausea."],
+      ["p6-vr-refresh-rate", "If you're looking at a television, or in this case, a virtual reality experience, you're looking at a series of images. This measurement defines how fast those images get updated. A higher reading cuts down on lag, and cutting down on lag means there's less of a chance of getting sick. It also means more responsive experiences. You definitely want to more than 60 frames per second."],
+      ["p6-vr-stitching", "This is the process of taking footage from different cameras, like GoPro cameras that have been used in a 360 camera mount, and combining that footage into spherical video. The process usually involves reorienting video, placing seams, and generally editing it so that it looks like one continuous view, rather than a patchwork of angles."],
+      ["p6-vr-field-of-view", "This is the angle of degrees in a visual field. Having a higher field of view is important because it contributes to the user having a feeling of immersion in a VR experience. The viewing angle for a healthy human eye is about 200 degrees. So, the bigger that angle is, the more immersive it feels."],
+      ["p6-vr-head-tracking", "This term refers to the sensors that keep up with the movement of the user's head and move the images being displayed so that they match the position of the head. In short, if you're wearing an Oculus Rift, for example, head tracking is what lets you look to the left, right, up, or down, and see the world that's been built in those directions."],
+      ["p6-vr-latency", "This describes the effect during a VR experience, when you turn your head, and you notice the visuals don't quite keep up. It's unpleasant, because that's not something that happens in the real world. That lag is an oft-cited complaint about VR experiences that aren't up to par for a variety of reasons."],
+      ["p6-vr-head-mounted-display", "These are the current form of hardware delivering VR experiences to users. It's typically goggles or a helmet of some type, the kind you strap to your face or put on your head. That's where you're viewing the VR experience. Some have sensors for head tracking, some don't."],
+      ["p6-vr-cinematic-vr", "For the most part, there are two types of VR you'll run into. There's the kind that's computer-generated graphics, and the kind made of real images. This term describes the second kind, and is made using cameras, whether rigs made of mounted GoPros or actual 360 cameras."],
+      ["p6-vr-eye-tracking", "This term refers to the sensors that read the position of users' eyes versus their head. So for example, there's an HMD called FOVE that integrates eye tracking into their headset. In their demo, the user can aim a weapon by looking in a different direction."],
+      ["p6-vr-judder", "In VR technology, this describes when there is a significant shaking in the images you see. In other words, they are not smooth, but moving in an unpleasant way."],
+      ["p6-vr-social-vr", "This term refers to a type of app that aims to create a shared VR space where users can interact with each other and even participate in activities."]
+    ]
+  );
+});
