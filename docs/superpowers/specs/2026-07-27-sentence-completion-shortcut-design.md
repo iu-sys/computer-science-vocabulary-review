@@ -12,6 +12,13 @@ The page is difficult to discover because PDF Practice defaults to `Definition M
 
 Make the supplied Page 1 Exercise 4 sentence-completion worksheet directly visible and reachable from PDF Practice without duplicating its data or changing vocabulary and worksheet totals.
 
+The Page 1 vocabulary is intentionally used by two different exercises, and both remain available:
+
+- the original 12-question `PDF Page 1 · Definition Matching` exercise;
+- the separate 12-question `PDF Page 1 · Exercise 4 · Sentence Completion` exercise shown in the supplied image.
+
+Adding the shortcut must not delete, replace, merge, or hide the original definition-matching exercise. Each exercise keeps its own answers, score, and saved progress.
+
 ## Interface
 
 Add a prominent native button immediately below the PDF Practice heading and above the existing worksheet selectors.
@@ -67,6 +74,8 @@ No vocabulary or worksheet record is added. Totals remain:
 - 10 worksheet groups;
 - 108 worksheet prompts.
 
+Those 108 prompts already count both Page 1 exercises: 12 definition-matching prompts and 12 sentence-completion prompts. The shortcut only exposes the existing second exercise more clearly, so it does not add another duplicate set of 12.
+
 ## Online and Offline Builds
 
 The shortcut is added to the maintainable HTML and application source. The existing build process regenerates `src/app.bundle.js` and `vocabulary-review-offline.html`, so the same shortcut and behavior are available on GitHub Pages and when the offline file is opened directly.
@@ -82,6 +91,8 @@ Automated checks verify:
 - application source maps the button and registers its click behavior;
 - the group label is exactly `PDF Page 1 · Exercise 4 · Sentence Completion`;
 - the group still has the same 12 prompts and answer order;
+- the original `p1-definition-matching` group still exists with its original 12 prompts;
+- `p1-definition-matching` and `p1-sentence-completion` retain separate saved-progress records;
 - vocabulary and worksheet totals remain 106 entries and 10 groups / 108 prompts;
 - generated online and offline artifacts contain the shortcut and its behavior;
 - the complete existing test suite passes.
@@ -89,6 +100,7 @@ Automated checks verify:
 Manual checks on desktop and a 390-pixel mobile viewport verify:
 
 - PDF Practice initially still opens Definition Matching;
+- the original Page 1 Definition Matching exercise remains selectable and unchanged;
 - the shortcut is clearly visible without changing the selector;
 - clicking or keyboard-activating it selects Sentence Completion and the Page 1 group;
 - all 12 supplied sentences appear in order;
