@@ -122,6 +122,47 @@ test("worksheet assignment replaces and removes answers immutably", () => {
   assert.deepEqual(original, { p1: "word-a", p2: "word-b" });
 });
 
+test("worksheet group selection preserves saved progress and clears only transient state", () => {
+  const progress = {
+    groups: {
+      "p1-definition-matching": {
+        assignments: { "p1-definition-1": "word-a" },
+        score: { correct: 1, total: 12 }
+      },
+      "p1-sentence-completion": {
+        assignments: { "p1-sentence-1": "word-b" },
+        score: { correct: 1, total: 12 }
+      }
+    }
+  };
+  const worksheetState = {
+    type: "definition-matching",
+    groupId: "p1-definition-matching",
+    selectedWordId: "word-a",
+    progress,
+    grade: { correct: 1, total: 12, results: [] }
+  };
+  const group = { id: "p1-sentence-completion", type: "sentence-completion" };
+
+  const selected = core.selectWorksheetGroup(worksheetState, group);
+
+  assert.deepEqual(selected, {
+    type: "sentence-completion",
+    groupId: "p1-sentence-completion",
+    selectedWordId: null,
+    progress,
+    grade: null
+  });
+  assert.strictEqual(selected.progress, progress);
+  assert.deepEqual(worksheetState, {
+    type: "definition-matching",
+    groupId: "p1-definition-matching",
+    selectedWordId: "word-a",
+    progress,
+    grade: { correct: 1, total: 12, results: [] }
+  });
+});
+
 test("worksheet grading distinguishes correct incorrect and unanswered", () => {
   const group = {
     prompts: [

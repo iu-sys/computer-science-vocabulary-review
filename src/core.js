@@ -98,6 +98,16 @@ export function removeWorksheetAnswer(assignments, promptId) {
   );
 }
 
+export function selectWorksheetGroup(worksheetState, group) {
+  return {
+    ...worksheetState,
+    type: group.type,
+    groupId: group.id,
+    selectedWordId: null,
+    grade: null
+  };
+}
+
 export function gradeWorksheetGroup(group, assignments) {
   const results = group.prompts.map((prompt) => ({
     promptId: prompt.id,

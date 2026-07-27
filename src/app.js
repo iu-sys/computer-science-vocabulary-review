@@ -11,6 +11,7 @@ import {
   mergeWorksheetProgress,
   progressStorage,
   removeWorksheetAnswer,
+  selectWorksheetGroup,
   worksheetMistakeVocabularyIds,
   worksheetProgressStorage,
   selectQuizEntries
@@ -212,10 +213,7 @@ function openSentenceCompletion() {
     announce("Page 1 Exercise 4 sentence completion is unavailable.");
     return;
   }
-  state.worksheet.type = group.type;
-  state.worksheet.groupId = group.id;
-  state.worksheet.selectedWordId = null;
-  state.worksheet.grade = null;
+  state.worksheet = selectWorksheetGroup(state.worksheet, group);
   renderWorksheetSelectors();
   renderWorksheet();
   announce("Opened Page 1 Exercise 4 sentence completion.");
