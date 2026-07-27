@@ -512,7 +512,7 @@ main {
         </label>
         <label for="quiz-scope">Question scope
           <select id="quiz-scope">
-            <option value="all">All 94 words</option>
+            <option value="all">All 106 words</option>
             <option value="random">10 random questions</option>
             <option value="mistakes">Up to 10 mistakes</option>
           </select>
@@ -692,7 +692,19 @@ const VOCABULARY = [
   { id: "p5-exercise-immutability", term: "immutability", definition: "the ability of a blockchain ledger to remain unchanged, and for a blockchain to remain unaltered", zh: "不可變性；不可竄改性", page: 5, source: "exercise" },
   { id: "p5-exercise-funds", term: "funds", definition: "money, often for a specific purpose such as a project or business venture", zh: "資金；款項", page: 5, source: "exercise" },
   { id: "p5-exercise-downtime", term: "downtime", definition: "the time during which a machine, especially a computer, is not working or is not able to be used", zh: "停機時間", page: 5, source: "exercise" },
-  { id: "p5-exercise-future-proof", term: "future-proof", definition: "to design software, a computer, etc. so that it can still be used for many years, even when technology changes", zh: "能適應未來的；面向未來的", page: 5, source: "exercise" }
+  { id: "p5-exercise-future-proof", term: "future-proof", definition: "to design software, a computer, etc. so that it can still be used for many years, even when technology changes", zh: "能適應未來的；面向未來的", page: 5, source: "exercise" },
+  { id: "p6-vr-vr-face", term: "VR face", definition: "The slightly embarrassing, slack-jawed look people get on their face when they wear an HMD!", zh: "VR 呆臉；戴頭戴裝置時的失神表情", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-simulator-sickness", term: "Simulator sickness", definition: "During a VR experience, this is a conflict between what your brain and body think they're doing, when you feel sick. Your eyes say, \"We're moving!\" And your brain says \"Nope! Let's get nauseated!\". This is one of the big challenges for developers -- figuring out how to move people without making them feel nausea.", zh: "模擬器暈動症", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-refresh-rate", term: "Refresh rate", definition: "If you're looking at a television, or in this case, a virtual reality experience, you're looking at a series of images. This measurement defines how fast those images get updated. A higher reading cuts down on lag, and cutting down on lag means there's less of a chance of getting sick. It also means more responsive experiences. You definitely want to more than 60 frames per second.", zh: "更新率；畫面刷新率", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-stitching", term: "Stitching", definition: "This is the process of taking footage from different cameras, like GoPro cameras that have been used in a 360 camera mount, and combining that footage into spherical video. The process usually involves reorienting video, placing seams, and generally editing it so that it looks like one continuous view, rather than a patchwork of angles.", zh: "影像拼接", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-field-of-view", term: "Field of view (FOV)", definition: "This is the angle of degrees in a visual field. Having a higher field of view is important because it contributes to the user having a feeling of immersion in a VR experience. The viewing angle for a healthy human eye is about 200 degrees. So, the bigger that angle is, the more immersive it feels.", zh: "視野範圍；視場", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-head-tracking", term: "Head tracking", definition: "This term refers to the sensors that keep up with the movement of the user's head and move the images being displayed so that they match the position of the head. In short, if you're wearing an Oculus Rift, for example, head tracking is what lets you look to the left, right, up, or down, and see the world that's been built in those directions.", zh: "頭部追蹤", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-latency", term: "Latency", definition: "This describes the effect during a VR experience, when you turn your head, and you notice the visuals don't quite keep up. It's unpleasant, because that's not something that happens in the real world. That lag is an oft-cited complaint about VR experiences that aren't up to par for a variety of reasons.", zh: "延遲；反應延遲", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-head-mounted-display", term: "Head mounted display or HMD", definition: "These are the current form of hardware delivering VR experiences to users. It's typically goggles or a helmet of some type, the kind you strap to your face or put on your head. That's where you're viewing the VR experience. Some have sensors for head tracking, some don't.", zh: "頭戴式顯示器", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-cinematic-vr", term: "Cinematic VR", definition: "For the most part, there are two types of VR you'll run into. There's the kind that's computer-generated graphics, and the kind made of real images. This term describes the second kind, and is made using cameras, whether rigs made of mounted GoPros or actual 360 cameras.", zh: "電影式虛擬實境；實景 VR", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-eye-tracking", term: "Eye tracking", definition: "This term refers to the sensors that read the position of users' eyes versus their head. So for example, there's an HMD called FOVE that integrates eye tracking into their headset. In their demo, the user can aim a weapon by looking in a different direction.", zh: "眼球追蹤", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-judder", term: "Judder", definition: "In VR technology, this describes when there is a significant shaking in the images you see. In other words, they are not smooth, but moving in an unpleasant way.", zh: "畫面抖動；影像顫動", page: 6, source: "vr-glossary" },
+  { id: "p6-vr-social-vr", term: "Social VR", definition: "This term refers to a type of app that aims to create a shared VR space where users can interact with each other and even participate in activities.", zh: "社交虛擬實境", page: 6, source: "vr-glossary" }
 ];
 
 const WORKSHEET_GROUPS = [
@@ -942,6 +954,40 @@ const WORKSHEET_GROUPS = [
       { id: "p5-definition-08", text: "money, often for a specific purpose such a project or business venture", answerId: "funds" },
       { id: "p5-definition-09", text: "the time during which a machine, especially a computer, is not working or is not able to be used", answerId: "downtime" },
       { id: "p5-definition-10", text: "to design software, a computer, etc. so that it can still be used for many years, even when technology changes", answerId: "future-proof" }
+    ]
+  },
+  {
+    id: "p6-vr-definition-matching",
+    label: "Page 6 繚 VR Mini-glossary",
+    page: 6,
+    type: "definition-matching",
+    wordBank: [
+      { id: "vr-face", term: "VR face", vocabularyId: "p6-vr-vr-face" },
+      { id: "simulator-sickness", term: "Simulator sickness", vocabularyId: "p6-vr-simulator-sickness" },
+      { id: "refresh-rate", term: "Refresh rate", vocabularyId: "p6-vr-refresh-rate" },
+      { id: "stitching", term: "Stitching", vocabularyId: "p6-vr-stitching" },
+      { id: "field-of-view", term: "Field of view (FOV)", vocabularyId: "p6-vr-field-of-view" },
+      { id: "head-tracking", term: "Head tracking", vocabularyId: "p6-vr-head-tracking" },
+      { id: "latency", term: "Latency", vocabularyId: "p6-vr-latency" },
+      { id: "head-mounted-display", term: "Head mounted display or HMD", vocabularyId: "p6-vr-head-mounted-display" },
+      { id: "cinematic-vr", term: "Cinematic VR", vocabularyId: "p6-vr-cinematic-vr" },
+      { id: "eye-tracking", term: "Eye tracking", vocabularyId: "p6-vr-eye-tracking" },
+      { id: "judder", term: "Judder", vocabularyId: "p6-vr-judder" },
+      { id: "social-vr", term: "Social VR", vocabularyId: "p6-vr-social-vr" }
+    ],
+    prompts: [
+      { id: "p6-vr-definition-01", text: "These are the current form of hardware delivering VR experiences to users. It's typically goggles or a helmet of some type, the kind you strap to your face or put on your head. That's where you're viewing the VR experience. Some have sensors for head tracking, some don't.", answerId: "head-mounted-display" },
+      { id: "p6-vr-definition-02", text: "This term refers to the sensors that keep up with the movement of the user's head and move the images being displayed so that they match the position of the head. In short, if you're wearing an Oculus Rift, for example, head tracking is what lets you look to the left, right, up, or down, and see the world that's been built in those directions.", answerId: "head-tracking" },
+      { id: "p6-vr-definition-03", text: "This term refers to the sensors that read the position of users' eyes versus their head. So for example, there's an HMD called FOVE that integrates eye tracking into their headset. In their demo, the user can aim a weapon by looking in a different direction.", answerId: "eye-tracking" },
+      { id: "p6-vr-definition-04", text: "This is the angle of degrees in a visual field. Having a higher field of view is important because it contributes to the user having a feeling of immersion in a VR experience. The viewing angle for a healthy human eye is about 200 degrees. So, the bigger that angle is, the more immersive it feels.", answerId: "field-of-view" },
+      { id: "p6-vr-definition-05", text: "This describes the effect during a VR experience, when you turn your head, and you notice the visuals don't quite keep up. It's unpleasant, because that's not something that happens in the real world. That lag is an oft-cited complaint about VR experiences that aren't up to par for a variety of reasons.", answerId: "latency" },
+      { id: "p6-vr-definition-06", text: "During a VR experience, this is a conflict between what your brain and body think they're doing, when you feel sick. Your eyes say, \"We're moving!\" And your brain says \"Nope! Let's get nauseated!\". This is one of the big challenges for developers -- figuring out how to move people without making them feel nausea.", answerId: "simulator-sickness" },
+      { id: "p6-vr-definition-07", text: "In VR technology, this describes when there is a significant shaking in the images you see. In other words, they are not smooth, but moving in an unpleasant way.", answerId: "judder" },
+      { id: "p6-vr-definition-08", text: "If you're looking at a television, or in this case, a virtual reality experience, you're looking at a series of images. This measurement defines how fast those images get updated. A higher reading cuts down on lag, and cutting down on lag means there's less of a chance of getting sick. It also means more responsive experiences. You definitely want to more than 60 frames per second.", answerId: "refresh-rate" },
+      { id: "p6-vr-definition-09", text: "This term refers to a type of app that aims to create a shared VR space where users can interact with each other and even participate in activities.", answerId: "social-vr" },
+      { id: "p6-vr-definition-10", text: "For the most part, there are two types of VR you'll run into. There's the kind that's computer-generated graphics, and the kind made of real images. This term describes the second kind, and is made using cameras, whether rigs made of mounted GoPros or actual 360 cameras.", answerId: "cinematic-vr" },
+      { id: "p6-vr-definition-11", text: "This is the process of taking footage from different cameras, like GoPro cameras that have been used in a 360 camera mount, and combining that footage into spherical video. The process usually involves reorienting video, placing seams, and generally editing it so that it looks like one continuous view, rather than a patchwork of angles.", answerId: "stitching" },
+      { id: "p6-vr-definition-12", text: "The slightly embarrassing, slack-jawed look people get on their face when they wear an HMD!", answerId: "vr-face" }
     ]
   },
   {

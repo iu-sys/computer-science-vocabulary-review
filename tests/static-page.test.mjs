@@ -35,7 +35,7 @@ test("direct-file entry point uses one local classic script", async () => {
 
 test("quiz scope defaults to all words and retains short practice options", async () => {
   const html = await readProjectFile("index.html");
-  const allIndex = html.indexOf('<option value="all">All 94 words</option>');
+  const allIndex = html.indexOf('<option value="all">All 106 words</option>');
   const randomIndex = html.indexOf('<option value="random">10 random questions</option>');
   const mistakesIndex = html.indexOf('<option value="mistakes">Up to 10 mistakes</option>');
 
@@ -88,5 +88,7 @@ test("generated runtime includes the complete worksheet dataset", async () => {
     assert.match(source, /p2-article-definition-matching/);
     assert.match(source, /p1-sentence-completion/);
     assert.match(source, /cs-pdf-practice-v1/);
+    assert.match(source, /p6-vr-definition-matching/);
+    assert.match(source, /p6-vr-head-mounted-display/);
   }
 });
