@@ -97,11 +97,24 @@ test("page 2 article group contains only the approved highlighted forms", () => 
   ]);
 });
 
-test("sentence completion has 12 single-blank prompts in PDF order", () => {
-  const group = WORKSHEET_GROUPS.find(
+test("both Page 1 exercises remain separate and sentence completion keeps image order", () => {
+  const definitionGroup = WORKSHEET_GROUPS.find(
+    ({ id }) => id === "p1-definition-matching"
+  );
+  const sentenceGroup = WORKSHEET_GROUPS.find(
     ({ id }) => id === "p1-sentence-completion"
   );
-  assert.deepEqual(group.wordBank.map(({ term }) => term), [
+
+  assert.equal(definitionGroup.type, "definition-matching");
+  assert.equal(definitionGroup.prompts.length, 12);
+  assert.equal(sentenceGroup.type, "sentence-completion");
+  assert.equal(sentenceGroup.prompts.length, 12);
+  assert.notEqual(definitionGroup.id, sentenceGroup.id);
+  assert.equal(
+    sentenceGroup.label,
+    "PDF Page 1 \u00b7 Exercise 4 \u00b7 Sentence Completion"
+  );
+  assert.deepEqual(sentenceGroup.wordBank.map(({ term }) => term), [
     "machine learning",
     "Turing Test",
     "natural language processing",
@@ -115,7 +128,7 @@ test("sentence completion has 12 single-blank prompts in PDF order", () => {
     "automation",
     "artificial intelligence"
   ]);
-  for (const prompt of group.prompts) {
+  for (const prompt of sentenceGroup.prompts) {
     assert.equal(prompt.text.split("{{blank}}").length, 2);
   }
 });

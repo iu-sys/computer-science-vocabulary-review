@@ -283,7 +283,7 @@ export const WORKSHEET_GROUPS = [
   },
   {
     id: "p1-sentence-completion",
-    label: "PDF Page 1 · Sentence Completion",
+    label: "PDF Page 1 \u00b7 Exercise 4 \u00b7 Sentence Completion",
     page: 1,
     type: "sentence-completion",
     wordBank: [
