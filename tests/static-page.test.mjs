@@ -90,5 +90,7 @@ test("generated runtime includes the complete worksheet dataset", async () => {
     assert.match(source, /cs-pdf-practice-v1/);
     assert.match(source, /p6-vr-definition-matching/);
     assert.match(source, /p6-vr-head-mounted-display/);
+    assert.match(source, /Page 6 · VR Mini-glossary/);
+    assert.doesNotMatch(source, /Page 6 繚 VR Mini-glossary/);
   }
 });
