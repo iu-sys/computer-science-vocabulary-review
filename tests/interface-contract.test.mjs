@@ -15,7 +15,7 @@ test("page exposes the complete accessible study interface", async () => {
     "next-question", "mistake-list", "retry-mistakes", "clear-progress",
     "worksheet-type", "worksheet-group", "worksheet-label", "worksheet-progress",
     "worksheet-bank", "worksheet-prompts", "worksheet-score",
-    "check-worksheet", "reset-worksheet",
+    "check-worksheet", "reset-worksheet", "open-sentence-completion",
     "previous-worksheet", "next-worksheet",
     "status-message"
   ];
@@ -23,6 +23,10 @@ test("page exposes the complete accessible study interface", async () => {
   for (const id of requiredIds) {
     assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id}`);
   }
+  assert.match(
+    html,
+    /<button[^>]+id=["']open-sentence-completion["'][^>]*>第 1 頁第 4 題 · 句子填空（12 題）<\/button>/
+  );
   assert.equal((html.match(/data-view-button=/g) || []).length, 4);
   assert.match(html, /<main\b/);
   assert.match(html, /aria-live=["']polite["']/);
@@ -77,5 +81,15 @@ test("app source includes required state, quiz, persistence, and safe-rendering 
   assert.match(app, /worksheetProgressStorage/);
   assert.match(app, /worksheetMistakeVocabularyIds/);
   assert.match(app, /worksheetScore\.textContent\s*=/);
+  assert.match(
+    app,
+    /openSentenceCompletion:\s*document\.querySelector\(["']#open-sentence-completion["']\)/
+  );
+  assert.match(app, /function\s+openSentenceCompletion\s*\(\)/);
+  assert.match(
+    app,
+    /openSentenceCompletion\.addEventListener\(["']click["'],\s*openSentenceCompletion\)/
+  );
+  assert.match(app, /Opened Page 1 Exercise 4 sentence completion\./);
   assert.doesNotMatch(app, /\.innerHTML\s*=/);
 });

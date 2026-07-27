@@ -70,6 +70,7 @@ const elements = {
   worksheetBank: document.querySelector("#worksheet-bank"),
   worksheetPrompts: document.querySelector("#worksheet-prompts"),
   worksheetScore: document.querySelector("#worksheet-score"),
+  openSentenceCompletion: document.querySelector("#open-sentence-completion"),
   checkWorksheet: document.querySelector("#check-worksheet"),
   resetWorksheet: document.querySelector("#reset-worksheet"),
   previousWorksheet: document.querySelector("#previous-worksheet"),
@@ -203,6 +204,21 @@ function renderWorksheetSelectors() {
     elements.worksheetGroup.append(option);
   }
   elements.worksheetGroup.value = state.worksheet.groupId;
+}
+
+function openSentenceCompletion() {
+  const group = worksheetById.get("p1-sentence-completion");
+  if (!group) {
+    announce("Page 1 Exercise 4 sentence completion is unavailable.");
+    return;
+  }
+  state.worksheet.type = group.type;
+  state.worksheet.groupId = group.id;
+  state.worksheet.selectedWordId = null;
+  state.worksheet.grade = null;
+  renderWorksheetSelectors();
+  renderWorksheet();
+  announce("Opened Page 1 Exercise 4 sentence completion.");
 }
 
 function worksheetSlot(prompt, promptNumber, wordById, assignments) {
@@ -659,6 +675,7 @@ elements.worksheetGroup.addEventListener("change", () => {
   state.worksheet.grade = null;
   renderWorksheet();
 });
+elements.openSentenceCompletion.addEventListener("click", openSentenceCompletion);
 elements.checkWorksheet.addEventListener("click", checkWorksheet);
 elements.resetWorksheet.addEventListener("click", resetWorksheet);
 elements.previousWorksheet.addEventListener("click", () => moveWorksheet(-1));

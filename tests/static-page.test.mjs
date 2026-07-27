@@ -12,7 +12,7 @@ test("page exposes required controls and no remote resources", async () => {
     "quiz-mode", "quiz-scope", "start-quiz", "clear-progress",
     "pdf-practice-view", "worksheet-type", "worksheet-group",
     "worksheet-bank", "worksheet-prompts", "worksheet-score",
-    "check-worksheet", "reset-worksheet"
+    "check-worksheet", "reset-worksheet", "open-sentence-completion"
   ]) {
     assert.ok(html.includes(`id="${id}"`), `missing #${id}`);
   }
