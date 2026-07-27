@@ -12,10 +12,11 @@ const expectedGroups = [
   ["p4-definition-matching-a", "definition-matching", 4, 8],
   ["p4-definition-matching-b", "definition-matching", 4, 10],
   ["p5-definition-matching", "definition-matching", 5, 10],
+  ["p6-vr-definition-matching", "definition-matching", 6, 12],
   ["p1-sentence-completion", "sentence-completion", 1, 12]
 ];
 
-test("worksheet inventory preserves PDF grouping, order, and 96 prompts", () => {
+test("worksheet inventory preserves grouping, order, and 108 prompts", () => {
   assert.deepEqual(
     WORKSHEET_GROUPS.map((group) => [
       group.id, group.type, group.page, group.prompts.length
@@ -24,8 +25,42 @@ test("worksheet inventory preserves PDF grouping, order, and 96 prompts", () => 
   );
   assert.equal(
     WORKSHEET_GROUPS.reduce((total, group) => total + group.prompts.length, 0),
-    96
+    108
   );
+});
+
+test("page 6 VR group preserves the supplied word and answer order", () => {
+  const group = WORKSHEET_GROUPS.find(
+    ({ id }) => id === "p6-vr-definition-matching"
+  );
+  assert.deepEqual(group.wordBank.map(({ term }) => term), [
+    "VR face",
+    "Simulator sickness",
+    "Refresh rate",
+    "Stitching",
+    "Field of view (FOV)",
+    "Head tracking",
+    "Latency",
+    "Head mounted display or HMD",
+    "Cinematic VR",
+    "Eye tracking",
+    "Judder",
+    "Social VR"
+  ]);
+  assert.deepEqual(group.prompts.map(({ answerId }) => answerId), [
+    "head-mounted-display",
+    "head-tracking",
+    "eye-tracking",
+    "field-of-view",
+    "latency",
+    "simulator-sickness",
+    "judder",
+    "refresh-rate",
+    "social-vr",
+    "cinematic-vr",
+    "stitching",
+    "vr-face"
+  ]);
 });
 
 test("every prompt answer and vocabulary mapping is valid and unique", () => {
